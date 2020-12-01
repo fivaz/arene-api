@@ -15,4 +15,9 @@ class Product extends Model
         'stock',
         'minimum_stock',
     ];
+
+    public function category()
+    {
+        return $this->belongsTo('App\Models\Category');
+    }
 }
