@@ -15,7 +15,7 @@ class ProductController extends Controller
      */
     public function index()
     {
-        return Product::all();
+        return response(Product::all());
     }
 
     /**
@@ -26,7 +26,7 @@ class ProductController extends Controller
      */
     public function store(Request $request)
     {
-        return Product::create($request->all());
+        return response(Product::create($request->all()));
     }
 
     /**
@@ -37,7 +37,7 @@ class ProductController extends Controller
      */
     public function show($id)
     {
-        return Product::find($id);
+        return response(Product::find($id));
     }
 
     /**
@@ -52,7 +52,7 @@ class ProductController extends Controller
 
         $product = Product::find($id);
         $product->update($request->all());
-        return $product;
+        return response($product);
     }
 
     /**
@@ -63,6 +63,6 @@ class ProductController extends Controller
      */
     public function destroy($id)
     {
-        return Product::destroy($id);
+        return response(Product::destroy($id));
     }
 }
