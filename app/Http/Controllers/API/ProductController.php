@@ -50,9 +50,9 @@ class ProductController extends Controller
     public function update(Request $request, $id)
     {
 
-        $post = Product::find($id);
-        Product::update($request->all());
-        return $post;
+        $product = Product::find($id);
+        $product->update($request->all());
+        return $product;
     }
 
     /**
