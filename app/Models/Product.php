@@ -14,6 +14,7 @@ class Product extends Model
         'price',
         'stock',
         'minimum_stock',
+        'category_id'
     ];
 
     public function category()

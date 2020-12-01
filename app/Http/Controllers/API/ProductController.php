@@ -3,6 +3,7 @@
 namespace App\Http\Controllers\API;
 
 use App\Http\Controllers\Controller;
+use App\Models\Category;
 use App\Models\Product;
 use Illuminate\Http\Request;
 
@@ -15,7 +16,7 @@ class ProductController extends Controller
      */
     public function index()
     {
-        return response(Product::all());
+        return response(Product::with('category')->get(), 200);
     }
 
     /**
@@ -26,7 +27,11 @@ class ProductController extends Controller
      */
     public function store(Request $request)
     {
-        return response(Product::create($request->all()));
+        $category = Category::find($request->category_id);
+        if ($category)
+            return response(Product::create($request->all()), 200);
+        else
+            return response(null, 404, ['message' => "this category_id isn't assigned to any category"]);
     }
 
     /**
@@ -35,9 +40,14 @@ class ProductController extends Controller
      * @param int $id
      * @return \Illuminate\Http\Response
      */
-    public function show($id)
+    public
+    function show($id)
     {
-        return response(Product::find($id));
+        $product = Product::find($id);
+        if ($product)
+            return response($product, 200);
+        else
+            return response(null, 204);
     }
 
     /**
@@ -47,7 +57,8 @@ class ProductController extends Controller
      * @param int $id
      * @return \Illuminate\Http\Response
      */
-    public function update(Request $request, $id)
+    public
+    function update(Request $request, $id)
     {
 
         $product = Product::find($id);
@@ -61,7 +72,8 @@ class ProductController extends Controller
      * @param int $id
      * @return \Illuminate\Http\Response
      */
-    public function destroy($id)
+    public
+    function destroy($id)
     {
         return response(Product::destroy($id));
     }
