@@ -29,7 +29,7 @@ class ProductController extends Controller
     {
         $category = Category::find($request->category_id);
         if ($category)
-            return response(Product::create($request->all()), 200);
+            return response(Product::create($request->all()), 201);
         else
             return response(null, 404, ['message' => "this category_id isn't assigned to any category"]);
     }
