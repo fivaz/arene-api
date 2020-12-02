@@ -12,4 +12,9 @@ class TradingCardGame extends Model
     protected $fillable = [
       'name'
     ];
+
+    public function products()
+    {
+        return $this->hasMany('App\Models\Product');
+    }
 }
