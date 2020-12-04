@@ -16,6 +16,9 @@ extension=fileinfo
 ```bash 
 extension=pdo_mysql
 ```
+```bash 
+extension=pdo_sqlite
+```
 
 ## Installation
 Il suffit d'exécuter sur la racine du projet :
