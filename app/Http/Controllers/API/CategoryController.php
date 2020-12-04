@@ -17,7 +17,7 @@ class CategoryController extends Controller
      */
     public function index()
     {
-        return response(Category::with('products')->get(), Response::HTTP_OK);
+        return response(Category::all(), Response::HTTP_OK);
     }
 
     /**
@@ -46,7 +46,6 @@ class CategoryController extends Controller
     public function show(int $id)
     {
         $category = Category::find($id);
-        $category->products;
         if ($category)
             return response($category, Response::HTTP_OK);
         else
