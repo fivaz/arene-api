@@ -12,6 +12,7 @@ class Product extends Model
 {
     use HasFactory;
 
+    //TODO check if some fillers in Models should be guarded instead of fillable (Mass assignment vulnerability)
     protected $fillable = [
         'name',
         'price',
