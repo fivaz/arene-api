@@ -16,7 +16,7 @@ class TradingCardGameController extends Controller
      */
     public function index()
     {
-        return response(TradingCardGame::with('products')->get(), 200);
+        return response(TradingCardGame::with('products')->get(), Response::HTTP_OK);
     }
 
     /**
@@ -41,7 +41,7 @@ class TradingCardGameController extends Controller
         $trading_card_game = TradingCardGame::find($id);
         $trading_card_game->products;
         if ($trading_card_game)
-            return response($trading_card_game, 200);
+            return response($trading_card_game, Response::HTTP_OK);
         else
             return response(null, 204);
     }

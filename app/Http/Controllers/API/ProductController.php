@@ -17,7 +17,7 @@ class ProductController extends Controller
      */
     public function index()
     {
-        return response(Product::with('category')->get(), 200);
+        return response(Product::with('category')->get(), Response::HTTP_OK);
     }
 
     /**
@@ -30,9 +30,9 @@ class ProductController extends Controller
     {
         $category = Category::find($request->category_id);
         if ($category)
-            return response(Product::create($request->all()), 201);
+            return response(Product::create($request->all()), Response::HTTP_CREATED);
         else
-            return response(null, 404, ['message' => "this category_id isn't assigned to any category"]);
+            return response(null, Response::HTTP_NOT_FOUND, ['message' => "this category_id isn't assigned to any category"]);
     }
 
     /**
@@ -46,9 +46,9 @@ class ProductController extends Controller
     {
         $product = Product::find($id);
         if ($product)
-            return response($product, 200);
+            return response($product, Response::HTTP_OK);
         else
-            return response(null, 204);
+            return response(null, Response::HTTP_NO_CONTENT);
     }
 
     /**
