@@ -59,9 +59,14 @@ class CategoryController extends Controller
      * @param int $id
      * @return Response
      */
-    public function update(Request $request, $id)
+    public function update(Request $request, int $id)
     {
-        //
+        $category = Category::find($id);
+        if ($category) {
+            $category->update($request->all());
+            return response(null, Response::HTTP_OK);
+        } else
+            return response(null, Response::HTTP_NOT_FOUND);
     }
 
     /**
@@ -70,8 +75,9 @@ class CategoryController extends Controller
      * @param int $id
      * @return Response
      */
-    public function destroy($id)
+    public function destroy(int $id)
     {
-        //
+        $status = Category::destroy($id) ? Response::HTTP_OK : Response::HTTP_NOT_FOUND;
+        return response(null, $status);
     }
 }
