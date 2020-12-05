@@ -16,6 +16,7 @@ class CreateTradingCardGamesTable extends Migration
         Schema::create('trading_card_games', function (Blueprint $table) {
             $table->id();
             $table->string('name');
+            $table->softDeletes();
             $table->timestamps();
         });
     }

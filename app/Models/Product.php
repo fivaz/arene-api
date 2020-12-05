@@ -4,6 +4,7 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\SoftDeletes;
 
 /**
  * @mixin IdeHelperProduct
@@ -11,6 +12,7 @@ use Illuminate\Database\Eloquent\Model;
 class Product extends Model
 {
     use HasFactory;
+    use SoftDeletes;
 
     //TODO check if some fillers in Models should be guarded instead of fillable (Mass assignment vulnerability)
     protected $fillable = [
@@ -20,6 +22,12 @@ class Product extends Model
         'minimum_stock',
         'category_id',
         'trading_card_game_id',
+    ];
+
+    protected $hidden = [
+        'created_at',
+        'updated_at',
+        'deleted_at'
     ];
 
     public function category()
