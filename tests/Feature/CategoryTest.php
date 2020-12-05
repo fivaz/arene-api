@@ -13,6 +13,7 @@ use Tests\TestCase;
 class CategoryTest extends TestCase
 {
     const URL = '/api/categories/';
+    const HEADERS = ['Accept' => 'application/json'];
 
     use RefreshDatabase;
     use WithFaker;
@@ -20,8 +21,7 @@ class CategoryTest extends TestCase
     /** @test */
     public function indexHappyPath()
     {
-        $this->withoutExceptionHandling();
-        $response = $this->get(CategoryTest::URL);
+        $response = $this->get(CategoryTest::URL, CategoryTest::HEADERS);
         $response->assertOk();
         $response->assertJson(Category::all()->toArray());
     }
@@ -29,9 +29,8 @@ class CategoryTest extends TestCase
     /** @test */
     public function showHappyPath()
     {
-        $this->withoutExceptionHandling();
         $category = Category::factory()->create();
-        $response = $this->get(CategoryTest::URL . $category->id);
+        $response = $this->get(CategoryTest::URL . $category->id, CategoryTest::HEADERS);
         $response->assertSimilarJson($category->toArray());
         $response->assertOk();
     }
@@ -39,10 +38,9 @@ class CategoryTest extends TestCase
     /** @test */
     public function showIdDoesntExist()
     {
-        $this->withoutExceptionHandling();
         $category = Category::factory()->create();
         $wrongId = $category->id + 1;
-        $response = $this->get(CategoryTest::URL . $wrongId);
+        $response = $this->get(CategoryTest::URL . $wrongId, CategoryTest::HEADERS);
         $this->assertEquals(null, $response->getContent());
         $response->assertNoContent();
     }
@@ -50,10 +48,10 @@ class CategoryTest extends TestCase
     /** @test */
     public function storeCategoryHappyPath()
     {
-        $this->withoutExceptionHandling();
-        $response = $this->post(CategoryTest::URL, [
-            'name' => $this->faker->name
-        ]);
+        $response = $this->post(CategoryTest::URL,
+            ['name' => $this->faker->name],
+            CategoryTest::HEADERS
+        );
 
         $response->assertCreated();
         $this->assertCount(1, Category::all());
@@ -62,11 +60,12 @@ class CategoryTest extends TestCase
     /** @test */
     public function storeCategoryWithNoName()
     {
-        $response = $this->post(CategoryTest::URL, [
-            'name' => ''
-        ]);
+        $response = $this->post(CategoryTest::URL,
+            ['name' => ''],
+            CategoryTest::HEADERS
+        );
 
-        $response->assertStatus(Response::HTTP_BAD_REQUEST);
+        $response->assertStatus(Response::HTTP_UNPROCESSABLE_ENTITY);
         $response->assertSeeText('name');
         $this->assertEmpty(Category::all());
     }
@@ -74,14 +73,14 @@ class CategoryTest extends TestCase
     /** @test */
     public function updateCategoryHappyPath()
     {
-        $this->withoutExceptionHandling();
         $category = Category::create([
             'name' => 'old category'
         ]);
         $expected_name = 'new category';
-        $response = $this->put(CategoryTest::URL . $category->id, [
-            'name' => $expected_name
-        ]);
+        $response = $this->put(CategoryTest::URL . $category->id,
+            ['name' => $expected_name],
+            CategoryTest::HEADERS
+        );
         $actual_category = Category::find($category->id);
 
         $response->assertOk();
@@ -91,15 +90,15 @@ class CategoryTest extends TestCase
     /** @test */
     public function updateCategoryDoesntExist()
     {
-        $this->withoutExceptionHandling();
         $expected_name = 'old category';
         $category = Category::create([
             'name' => $expected_name
         ]);
         $category_id = $category->id + 1;
-        $response = $this->put(CategoryTest::URL . $category_id, [
-            'name' => $expected_name
-        ]);
+        $response = $this->put(CategoryTest::URL . $category_id,
+            ['name' => $expected_name],
+            CategoryTest::HEADERS
+        );
         $actual_category = Category::find($category->id);
         $response->assertNotFound();
         $response->assertJson(Message::FAILED_UPDATE);
@@ -109,28 +108,30 @@ class CategoryTest extends TestCase
     /** @test */
     public function updateCategoryWithNoName()
     {
-        $this->withoutExceptionHandling();
         $category = Category::create([
             'name' => 'old category'
         ]);
-        $response = $this->put(CategoryTest::URL . $category->id, [
-            'name' => ''
-        ]);
+        $response = $this->put(CategoryTest::URL . $category->id,
+            ['name' => ''],
+            CategoryTest::HEADERS
+        );
         $actual_category = Category::find($category->id);
         $this->assertEquals($actual_category->toArray(), $category->toArray());
 
-        $response->assertStatus(Response::HTTP_BAD_REQUEST);
+        $response->assertStatus(Response::HTTP_UNPROCESSABLE_ENTITY);
         $response->assertSeeText('name');
     }
 
     /** @test */
     public function deleteCategoryHappyPath()
     {
-        $this->withoutExceptionHandling();
         $category = Category::factory()->create();
         $product = Product::factory()->create();
         $product->category()->associate($category)->save();
-        $response = $this->delete(CategoryTest::URL . $category->id);
+        $response = $this->delete(CategoryTest::URL . $category->id,
+            [],
+            CategoryTest::HEADERS
+        );
         $products = Product::where(['category_id' => $category->id])->get();
 
         $this->assertEmpty($products->toArray());
@@ -141,10 +142,12 @@ class CategoryTest extends TestCase
     /** @test */
     public function deleteCategoryUnhappyPath()
     {
-        $this->withoutExceptionHandling();
         $category = Category::factory()->create();
         $category_id = $category->id + 1;
-        $response = $this->delete(CategoryTest::URL . $category_id);
+        $response = $this->delete(CategoryTest::URL . $category_id,
+            [],
+            CategoryTest::HEADERS
+        );
         $this->assertNotNull(Category::find($category->id));
         $response->assertNotFound();
         $response->assertJson(Message::FAILED_DELETED);
