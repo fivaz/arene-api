@@ -63,8 +63,15 @@ class CategoryController extends Controller
     {
         $category = Category::find($id);
         if ($category) {
-            $category->update($request->all());
-            return response(null, Response::HTTP_OK);
+            $validator = Validator::make($request->all(), [
+                'name' => 'required'
+            ]);
+            if ($validator->fails())
+                return response($validator->messages(), Response::HTTP_BAD_REQUEST);
+            else {
+                $category->update($request->all());
+                return response(null, Response::HTTP_OK);
+            }
         } else
             //TODO all these errors messages must be added to a class as constant and called whenever it's necessary to
             // avoid futur problems
