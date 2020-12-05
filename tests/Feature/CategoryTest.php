@@ -6,6 +6,7 @@ use App\Models\Category;
 use App\Models\Product;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Foundation\Testing\WithFaker;
+use Illuminate\Http\Response;
 use Tests\TestCase;
 
 class CategoryTest extends TestCase
@@ -58,13 +59,13 @@ class CategoryTest extends TestCase
     }
 
     /** @test */
-    public function storeCategoryMustHaveAName()
+    public function storeCategoryWithNoName()
     {
         $response = $this->post(CategoryTest::URL, [
             'name' => ''
         ]);
 
-        $response->assertStatus(400);
+        $response->assertStatus(Response::HTTP_BAD_REQUEST);
         $response->assertSeeText('name');
         $this->assertEmpty(Category::all());
     }
@@ -87,7 +88,7 @@ class CategoryTest extends TestCase
     }
 
     /** @test */
-    public function updateCategoryUnHappyPath()
+    public function updateCategoryDoesntExist()
     {
         $this->withoutExceptionHandling();
         $expected_name = 'old category';
@@ -102,6 +103,23 @@ class CategoryTest extends TestCase
         $response->assertNotFound();
         $response->assertJson(['error' => "the resource you're trying to update doesn't exist"]);
         $this->assertEquals($expected_name, $actual_category->name);
+    }
+
+    /** @test */
+    public function updateCategoryWithNoName()
+    {
+        $this->withoutExceptionHandling();
+        $category = Category::create([
+            'name' => 'old category'
+        ]);
+        $response = $this->put(CategoryTest::URL . $category->id, [
+            'name' => ''
+        ]);
+        $actual_category = Category::find($category->id);
+        $this->assertEquals($actual_category->toArray(), $category->toArray());
+
+        $response->assertStatus(Response::HTTP_BAD_REQUEST);
+        $response->assertSeeText('name');
     }
 
     /** @test */
