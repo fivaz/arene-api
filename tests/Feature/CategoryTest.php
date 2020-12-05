@@ -3,11 +3,10 @@
 namespace Tests\Feature;
 
 use App\Models\Category;
+use App\Models\Product;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Foundation\Testing\WithFaker;
 use Tests\TestCase;
-use function PHPUnit\Framework\assertEquals;
-use function PHPUnit\Framework\assertNull;
 
 class CategoryTest extends TestCase
 {
@@ -42,7 +41,7 @@ class CategoryTest extends TestCase
         $category = Category::factory()->create();
         $wrongId = $category->id + 1;
         $response = $this->get(CategoryTest::URL . $wrongId);
-        assertEquals(null, $response->getContent());
+        $this->assertEquals(null, $response->getContent());
         $response->assertNoContent();
     }
 
@@ -67,6 +66,7 @@ class CategoryTest extends TestCase
 
         $response->assertStatus(400);
         $response->assertSeeText('name');
+        $this->assertEmpty(Category::all());
     }
 
     /** @test */
@@ -83,7 +83,7 @@ class CategoryTest extends TestCase
         $actual_category = Category::find($category->id);
 
         $response->assertOk();
-        assertEquals($expected_name, $actual_category->name);
+        $this->assertEquals($expected_name, $actual_category->name);
     }
 
     /** @test */
@@ -101,7 +101,7 @@ class CategoryTest extends TestCase
         $actual_category = Category::find($category->id);
         $response->assertNotFound();
         $response->assertJson(['error' => "the resource you're trying to update doesn't exist"]);
-        assertEquals($expected_name, $actual_category->name);
+        $this->assertEquals($expected_name, $actual_category->name);
     }
 
     /** @test */
@@ -109,8 +109,13 @@ class CategoryTest extends TestCase
     {
         $this->withoutExceptionHandling();
         $category = Category::factory()->create();
+        $product = Product::factory()->create();
+        $product->category()->associate($category)->save();
         $response = $this->delete(CategoryTest::URL . $category->id);
-        assertNull(Category::find($category->id));
+        $products = Product::where(['category_id' => $category->id])->get();
+
+        $this->assertEmpty($products->toArray());
+        $this->assertNull(Category::find($category->id));
         $response->assertOk();
     }
 
@@ -121,7 +126,7 @@ class CategoryTest extends TestCase
         $category = Category::factory()->create();
         $category_id = $category->id + 1;
         $response = $this->delete(CategoryTest::URL . $category_id);
-        self::assertNotNull(Category::find($category->id));
+        $this->assertNotNull(Category::find($category->id));
         $response->assertNotFound();
         $response->assertJson(['error' => "the resource you're trying to delete doesn't exist"]);
     }
