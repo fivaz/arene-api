@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers\API;
 
+use App\Exceptions\Message;
 use App\Http\Controllers\Controller;
 use App\Models\Category;
 use Illuminate\Http\Request;
@@ -73,9 +74,7 @@ class CategoryController extends Controller
                 return response(null, Response::HTTP_OK);
             }
         } else
-            //TODO all these errors messages must be added to a class as constant and called whenever it's necessary to
-            // avoid futur problems
-            return response(['error' => "the resource you're trying to update doesn't exist"], Response::HTTP_NOT_FOUND);
+            return response(Message::FAILED_UPDATE, Response::HTTP_NOT_FOUND);
     }
 
     /**
@@ -94,7 +93,7 @@ class CategoryController extends Controller
             return response(null, $status);
         } else {
             $status = Response::HTTP_NOT_FOUND;
-            return response(['error' => "the resource you're trying to delete doesn't exist"], $status);
+            return response(Message::FAILED_DELETED, $status);
         }
     }
 }

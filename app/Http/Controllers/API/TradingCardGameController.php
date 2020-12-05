@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers\API;
 
+use App\Exceptions\Message;
 use App\Http\Controllers\Controller;
 use App\Models\TradingCardGame;
 use Illuminate\Http\Request;
@@ -43,7 +44,7 @@ class TradingCardGameController extends Controller
         if ($trading_card_game)
             return response($trading_card_game, Response::HTTP_OK);
         else
-            return response(null, 204);
+            return response(null, Response::HTTP_NO_CONTENT);
     }
 
     /**
@@ -69,12 +70,15 @@ class TradingCardGameController extends Controller
      */
     public function destroy(int $id)
     {
-        if(TradingCardGame::destroy($id)){
+        $trading_card_game = TradingCardGame::find($id);
+        if ($trading_card_game) {
+            TradingCardGame::destroy($id);
+            $trading_card_game->products()->update(['trading_card_game_id' => null]);
             $status = Response::HTTP_OK;
             return response(null, $status);
-        }else{
+        } else {
             $status = Response::HTTP_NOT_FOUND;
-            return response(['error' => "the resource you're trying to delete doesn't exist"], $status);
+            return response(Message::FAILED_DELETED, $status);
         }
     }
 }
