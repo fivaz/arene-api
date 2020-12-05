@@ -27,6 +27,7 @@ class TradingCardGameController extends Controller
      */
     public function store(Request $request)
     {
+        //TODO add validation to all models
         return response(TradingCardGame::create($request->all()), 201);
     }
 
@@ -54,6 +55,7 @@ class TradingCardGameController extends Controller
      */
     public function update(Request $request, int $id)
     {
+        //TODO add status to all functions of all models
         $trading_card_game = TradingCardGame::find($id);
         $trading_card_game->update($request->all());
         return response($trading_card_game);
@@ -67,6 +69,12 @@ class TradingCardGameController extends Controller
      */
     public function destroy(int $id)
     {
-        return response(TradingCardGame::destroy($id));
+        if(TradingCardGame::destroy($id)){
+            $status = Response::HTTP_OK;
+            return response(null, $status);
+        }else{
+            $status = Response::HTTP_NOT_FOUND;
+            return response(['error' => "the resource you're trying to delete doesn't exist"], $status);
+        }
     }
 }

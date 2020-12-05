@@ -28,11 +28,12 @@ class ProductController extends Controller
      */
     public function store(Request $request)
     {
+        //TODO check if TCG exists too
         $category = Category::find($request->category_id);
         if ($category)
             return response(Product::create($request->all()), Response::HTTP_CREATED);
         else
-            return response(null, Response::HTTP_NOT_FOUND, ['message' => "this category_id isn't assigned to any category"]);
+            return response(['error' => "this category_id isn't assigned to any category"], Response::HTTP_NOT_FOUND);
     }
 
     /**
@@ -62,8 +63,11 @@ class ProductController extends Controller
     function update(Request $request, int $id)
     {
         $product = Product::find($id);
-        $product->update($request->all());
-        return response($product);
+        if ($product) {
+            $product->update($request->all());
+            return response(null, Response::HTTP_OK);
+        } else
+            return response(['error' => "the resource you're trying to update doesn't exist"], Response::HTTP_NOT_FOUND);
     }
 
     /**
@@ -75,6 +79,12 @@ class ProductController extends Controller
     public
     function destroy(int $id)
     {
-        return response(Product::destroy($id));
+        if(Product::destroy($id)){
+            $status = Response::HTTP_OK;
+            return response(null, $status);
+        }else{
+            $status = Response::HTTP_NOT_FOUND;
+            return response(['error' => "the resource you're trying to delete doesn't exist"], $status);
+        }
     }
 }
