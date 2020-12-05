@@ -79,10 +79,13 @@ class CategoryController extends Controller
      */
     public function destroy(int $id)
     {
-        if(Category::destroy($id)){
+        $category = Category::find($id);
+        if ($category) {
+            Category::destroy($id);
+            $category->products()->update(['category_id' => null]);
             $status = Response::HTTP_OK;
             return response(null, $status);
-        }else{
+        } else {
             $status = Response::HTTP_NOT_FOUND;
             return response(['error' => "the resource you're trying to delete doesn't exist"], $status);
         }
