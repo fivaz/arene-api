@@ -5,6 +5,7 @@ namespace App\Http\Controllers\API;
 use App\Exceptions\Message;
 use App\Http\Controllers\Controller;
 use App\Models\Category;
+use Exception;
 use Illuminate\Http\Request;
 use Illuminate\Http\Response;
 use Validator;
@@ -46,11 +47,12 @@ class CategoryController extends Controller
      */
     public function show(int $id)
     {
-        $category = Category::find($id);
-        if ($category)
+        try {
+            $category = Category::findOrFail($id);
             return response($category, Response::HTTP_OK);
-        else
+        } catch (Exception $exception) {
             return response(null, Response::HTTP_NO_CONTENT);
+        }
     }
 
     /**
@@ -62,8 +64,8 @@ class CategoryController extends Controller
      */
     public function update(Request $request, int $id)
     {
-        $category = Category::find($id);
-        if ($category) {
+        try {
+            $category = Category::findOrFail($id);
             $validator = Validator::make($request->all(), [
                 'name' => 'required'
             ]);
@@ -73,8 +75,9 @@ class CategoryController extends Controller
                 $category->update($request->all());
                 return response(null, Response::HTTP_OK);
             }
-        } else
+        } catch (Exception $exception) {
             return response(Message::FAILED_UPDATE, Response::HTTP_NOT_FOUND);
+        }
     }
 
     /**
@@ -85,15 +88,13 @@ class CategoryController extends Controller
      */
     public function destroy(int $id)
     {
-        $category = Category::find($id);
-        if ($category) {
+        try {
+            $category = Category::findOrFail($id);
             Category::destroy($id);
             $category->products()->update(['category_id' => null]);
-            $status = Response::HTTP_OK;
-            return response(null, $status);
-        } else {
-            $status = Response::HTTP_NOT_FOUND;
-            return response(Message::FAILED_DELETED, $status);
+            return response(null, Response::HTTP_OK);
+        } catch (Exception $exception) {
+            return response(Message::FAILED_DELETED, Response::HTTP_NOT_FOUND);
         }
     }
 }
