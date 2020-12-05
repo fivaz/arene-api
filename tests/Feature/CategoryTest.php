@@ -2,6 +2,7 @@
 
 namespace Tests\Feature;
 
+use App\Exceptions\Message;
 use App\Models\Category;
 use App\Models\Product;
 use Illuminate\Foundation\Testing\RefreshDatabase;
@@ -101,7 +102,7 @@ class CategoryTest extends TestCase
         ]);
         $actual_category = Category::find($category->id);
         $response->assertNotFound();
-        $response->assertJson(['error' => "the resource you're trying to update doesn't exist"]);
+        $response->assertJson(Message::FAILED_UPDATE);
         $this->assertEquals($expected_name, $actual_category->name);
     }
 
@@ -146,6 +147,6 @@ class CategoryTest extends TestCase
         $response = $this->delete(CategoryTest::URL . $category_id);
         $this->assertNotNull(Category::find($category->id));
         $response->assertNotFound();
-        $response->assertJson(['error' => "the resource you're trying to delete doesn't exist"]);
+        $response->assertJson(Message::FAILED_DELETED);
     }
 }
