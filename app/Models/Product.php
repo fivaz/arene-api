@@ -39,4 +39,9 @@ class Product extends Model
     {
         return $this->belongsTo('App\Models\TradingCardGame');
     }
+
+    public function language()
+    {
+        return $this->belongsTo('App\Models\Language');
+    }
 }
