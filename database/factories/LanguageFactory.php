@@ -3,7 +3,6 @@
 namespace Database\Factories;
 
 use App\Models\Language;
-use Arr;
 use Illuminate\Database\Eloquent\Factories\Factory;
 
 class LanguageFactory extends Factory
@@ -23,7 +22,7 @@ class LanguageFactory extends Factory
     public function definition()
     {
         return [
-            'name' => Arr::random( ['Anglais', 'Français'])
+            'name' => $this->faker->unique()->languageCode
         ];
     }
 }
