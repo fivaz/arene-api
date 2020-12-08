@@ -1,6 +1,7 @@
 <?php
 
 use App\Http\Controllers\API\CategoryController;
+use App\Http\Controllers\API\LanguageController;
 use App\Http\Controllers\API\ProductController;
 use App\Http\Controllers\API\TradingCardGameController;
 use Illuminate\Http\Request;
@@ -25,5 +26,6 @@ Route::apiResources([
     'products' => ProductController::class,
     'categories' => CategoryController::class,
     'tcgames' => TradingCardGameController::class,
+    'languages' => LanguageController::class,
 ]);
 
