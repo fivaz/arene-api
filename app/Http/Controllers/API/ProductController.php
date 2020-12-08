@@ -4,8 +4,8 @@ namespace App\Http\Controllers\API;
 
 use App\Exceptions\Message;
 use App\Http\Controllers\Controller;
-use App\Http\Requests\SaveProductRequest;
-use App\Models\Category;
+use App\Http\Requests\StoreProductRequest;
+use App\Http\Requests\UpdateProductRequest;
 use App\Models\Product;
 use Exception;
 use Illuminate\Http\Response;
@@ -25,10 +25,10 @@ class ProductController extends Controller
     /**
      * Store a newly created resource in storage.
      *
-     * @param SaveProductRequest $request
+     * @param StoreProductRequest $request
      * @return Response
      */
-    public function store(SaveProductRequest $request)
+    public function store(StoreProductRequest $request)
     {
         $product = new Product();
         $product->fill($request->validated())->save();
@@ -44,7 +44,7 @@ class ProductController extends Controller
     public function show(int $id)
     {
         try {
-            $category = Category::findOrFail($id);
+            $category = Product::findOrFail($id);
             return response($category);
         } catch (Exception $exception) {
             return response(null, Response::HTTP_NO_CONTENT);
@@ -54,11 +54,11 @@ class ProductController extends Controller
     /**
      * Update the specified resource in storage.
      *
-     * @param SaveProductRequest $request
+     * @param UpdateProductRequest $request
      * @param int $id
      * @return Response
      */
-    public function update(SaveProductRequest $request, int $id)
+    public function update(UpdateProductRequest $request, int $id)
     {
         try {
             $product = Product::findOrFail($id);
