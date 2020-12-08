@@ -14,7 +14,6 @@ class Product extends Model
     use HasFactory;
     use SoftDeletes;
 
-    //TODO check if some fillers in Models should be guarded instead of fillable (Mass assignment vulnerability)
     protected $fillable = [
         'name',
         'price',
@@ -23,6 +22,12 @@ class Product extends Model
         'category_id',
         'trading_card_game_id',
         'language_id',
+    ];
+
+    protected $casts = [
+      'price' => 'double',
+      'stock' => 'integer',
+      'minimum_stock' => 'integer',
     ];
 
     protected $hidden = [
