@@ -14,6 +14,7 @@ class DatabaseSeeder extends Seeder
     public function run()
     {
         $this->call([
+            LanguageSeeder::class,
             TradingCardGameSeeder::class,
             CategorySeeder::class,
         ]);
