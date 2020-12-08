@@ -4,8 +4,9 @@ namespace App\Http\Controllers\API;
 
 use App\Exceptions\Message;
 use App\Http\Controllers\Controller;
+use App\Http\Requests\SaveTradingCardGameRequest;
 use App\Models\TradingCardGame;
-use Illuminate\Http\Request;
+use Exception;
 use Illuminate\Http\Response;
 
 class TradingCardGameController extends Controller
@@ -17,19 +18,20 @@ class TradingCardGameController extends Controller
      */
     public function index()
     {
-        return response(TradingCardGame::all(), Response::HTTP_OK);
+        return response(TradingCardGame::all());
     }
 
     /**
      * Store a newly created resource in storage.
      *
-     * @param Request $request
+     * @param SaveTradingCardGameRequest $request
      * @return Response
      */
-    public function store(Request $request)
+    public function store(SaveTradingCardGameRequest $request)
     {
-        //TODO add validation to all models
-        return response(TradingCardGame::create($request->all()), 201);
+        $trading_card_game = new TradingCardGame();
+        $trading_card_game->fill($request->validated())->save();
+        return response($trading_card_game, Response::HTTP_CREATED);
     }
 
     /**
@@ -40,26 +42,30 @@ class TradingCardGameController extends Controller
      */
     public function show(int $id)
     {
-        $trading_card_game = TradingCardGame::find($id);
-        if ($trading_card_game)
-            return response($trading_card_game, Response::HTTP_OK);
-        else
+        try {
+            $trading_card_game = TradingCardGame::findOrFail($id);
+            return response($trading_card_game);
+        } catch (Exception $exception) {
             return response(null, Response::HTTP_NO_CONTENT);
+        }
     }
 
     /**
      * Update the specified resource in storage.
      *
-     * @param Request $request
+     * @param SaveTradingCardGameRequest $request
      * @param int $id
      * @return Response
      */
-    public function update(Request $request, int $id)
+    public function update(SaveTradingCardGameRequest $request, int $id)
     {
-        //TODO add status to all functions of all models
-        $trading_card_game = TradingCardGame::find($id);
-        $trading_card_game->update($request->all());
-        return response($trading_card_game);
+        try {
+            $trading_card_game = TradingCardGame::findOrFail($id);
+            $trading_card_game->fill($request->validated())->save();
+            return response(null);
+        } catch (Exception $exception) {
+            return response(Message::FAILED_UPDATE, Response::HTTP_NOT_FOUND);
+        }
     }
 
     /**
@@ -70,15 +76,13 @@ class TradingCardGameController extends Controller
      */
     public function destroy(int $id)
     {
-        $trading_card_game = TradingCardGame::find($id);
-        if ($trading_card_game) {
+        try {
+            $trading_card_game = TradingCardGame::findOrFail($id);
             TradingCardGame::destroy($id);
             $trading_card_game->products()->update(['trading_card_game_id' => null]);
-            $status = Response::HTTP_OK;
-            return response(null, $status);
-        } else {
-            $status = Response::HTTP_NOT_FOUND;
-            return response(Message::FAILED_DELETED, $status);
+            return response(null);
+        } catch (Exception $exception) {
+            return response(Message::FAILED_DELETED, Response::HTTP_NOT_FOUND);
         }
     }
 }
