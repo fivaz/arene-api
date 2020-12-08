@@ -17,8 +17,8 @@ class CreateProductsTable extends Migration
             $table->id();
             $table->string('name');
             $table->decimal('price', 10, 2);
-            $table->integer('stock');
-            $table->integer('minimum_stock');
+            $table->integer('stock')->nullable();
+            $table->integer('minimum_stock')->nullable();
             $table->softDeletes();
             $table->timestamps();
         });
