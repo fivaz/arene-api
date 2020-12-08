@@ -22,6 +22,7 @@ class Product extends Model
         'minimum_stock',
         'category_id',
         'trading_card_game_id',
+        'language_id',
     ];
 
     protected $hidden = [

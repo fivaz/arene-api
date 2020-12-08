@@ -4,9 +4,10 @@ namespace App\Http\Controllers\API;
 
 use App\Exceptions\Message;
 use App\Http\Controllers\Controller;
+use App\Http\Requests\SaveProductRequest;
 use App\Models\Category;
 use App\Models\Product;
-use Illuminate\Http\Request;
+use Exception;
 use Illuminate\Http\Response;
 
 class ProductController extends Controller
@@ -18,23 +19,20 @@ class ProductController extends Controller
      */
     public function index()
     {
-        return response(Product::all(), Response::HTTP_OK);
+        return response(Product::all());
     }
 
     /**
      * Store a newly created resource in storage.
      *
-     * @param Request $request
+     * @param SaveProductRequest $request
      * @return Response
      */
-    public function store(Request $request)
+    public function store(SaveProductRequest $request)
     {
-        //TODO check if TCG exists too
-        $category = Category::find($request->category_id);
-        if ($category)
-            return response(Product::create($request->all()), Response::HTTP_CREATED);
-        else
-            return response(['error' => "this category_id isn't assigned to any category"], Response::HTTP_NOT_FOUND);
+        $product = new Product();
+        $product->fill($request->validated())->save();
+        return response($product, Response::HTTP_CREATED);
     }
 
     /**
@@ -43,32 +41,32 @@ class ProductController extends Controller
      * @param int $id
      * @return Response
      */
-    public
-    function show(int $id)
+    public function show(int $id)
     {
-        $product = Product::find($id);
-        if ($product)
-            return response($product, Response::HTTP_OK);
-        else
+        try {
+            $category = Category::findOrFail($id);
+            return response($category);
+        } catch (Exception $exception) {
             return response(null, Response::HTTP_NO_CONTENT);
+        }
     }
 
     /**
      * Update the specified resource in storage.
      *
-     * @param Request $request
+     * @param SaveProductRequest $request
      * @param int $id
      * @return Response
      */
-    public
-    function update(Request $request, int $id)
+    public function update(SaveProductRequest $request, int $id)
     {
-        $product = Product::find($id);
-        if ($product) {
-            $product->update($request->all());
-            return response(null, Response::HTTP_OK);
-        } else
+        try {
+            $product = Product::findOrFail($id);
+            $product->fill($request->validated())->save();
+            return response(null);
+        } catch (Exception $exception) {
             return response(Message::FAILED_UPDATE, Response::HTTP_NOT_FOUND);
+        }
     }
 
     /**
@@ -77,15 +75,11 @@ class ProductController extends Controller
      * @param int $id
      * @return Response
      */
-    public
-    function destroy(int $id)
+    public function destroy(int $id)
     {
-        if(Product::destroy($id)){
-            $status = Response::HTTP_OK;
-            return response(null, $status);
-        }else{
-            $status = Response::HTTP_NOT_FOUND;
-            return response(Message::FAILED_DELETED, $status);
-        }
+        if (Product::destroy($id))
+            return response(null);
+        else
+            return response(Message::FAILED_DELETED, Response::HTTP_NOT_FOUND);
     }
 }
