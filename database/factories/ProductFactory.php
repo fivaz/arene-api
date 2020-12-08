@@ -26,6 +26,10 @@ class ProductFactory extends Factory
             'price' => $this->faker->randomFloat(2, 0, 99),
             'stock' => $this->faker->randomNumber(3),
             'minimum_stock' => $this->faker->randomNumber(2),
+            //TODO check if it's really necessary to add these fields
+            'category_id' => null,
+            'trading_card_game_id' => null,
+            'language_id' => null,
         ];
     }
 }
